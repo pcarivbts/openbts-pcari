@@ -162,7 +162,8 @@ enum GSMBand {
 	GSM850=850,			///< US cellular
 	EGSM900=900,		///< extended GSM
 	DCS1800=1800,		///< worldwide DCS band
-	PCS1900=1900		///< US PCS band
+	PCS1900=1900,		///< US PCS band
+	SMC390=390          ///< Unlicensed band
 };
 
 
@@ -424,7 +425,7 @@ class Time {
         unsigned newTN = (mTN + other.mTN) % 8;
 		uint64_t newFN = (mFN+other.mFN + (mTN + other.mTN)/8) % gHyperframe;
         return Time(newFN,newTN);
-    } 
+    }
 
 	int operator-(const Time& other) const
 	{

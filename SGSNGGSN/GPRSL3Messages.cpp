@@ -726,6 +726,7 @@ void SmQoS::defaultPS(unsigned rateDownlink, unsigned rateUplink)
 const char *AccessTechnologyType2Name(AccessTechnologyType type)
 {
 	switch (type) {
+	    CASENAME(SMC_390)
 		CASENAME(GSM_P)
 		CASENAME(GSM_E)
 		CASENAME(GSM_R)
@@ -926,14 +927,14 @@ void MsRaCapability::parseMsRaCapability()
 }
 
 void MsRaCapability::text2(std::ostream &os, bool verbose) const
-{		
+{
 	if (!sEnableMsRaCap ) {return;}
 	for (int numTechs = 0; numTechs < sMsRaCapMaxTypes; numTechs++) {
 		if (! mCList[numTechs].mValid) {continue;}
 		// Dont bother to print the types that Range does not support.
 		AccessTechnologyType atype = mCList[numTechs].mTechType;
 		switch (atype) {
-		case GSM_E: case GSM_850: case GSM_1800: case GSM_1900:
+		case GSM_E: case GSM_850: case SMC_390: case GSM_1800: case GSM_1900:
 			os << (verbose ? "\t" : " ");
 			os <<" MsRaCapability[" << AccessTechnologyType2Name(atype) << "]=(";
 			if (mCList[numTechs].mSameAsPrevious) {
@@ -1189,9 +1190,9 @@ void L3GmmMsgAuthenticationResponse::gmmParseBody(L3GmmFrame &src, size_t &rp)
                 unsigned iei = src.readIEI(rp);
                 switch (iei) {
                 case 0x22: // SRES/RES 4 bytes
-			for (int i = 0; i < 4; i++) 
+			for (int i = 0; i < 4; i++)
 				SRES.setByte(i,src.readByte(rp));
-			mSRES = SRES;	
+			mSRES = SRES;
                         break;
                 case 0x23: // IMEISV  TLV of 11 bytes
 			// ignore for now;
@@ -1431,7 +1432,7 @@ void GMMRoutingAreaIdIE::raLoad()
 	mMCC[0] = wMCC[0]-'0';
 	mMCC[1] = wMCC[1]-'0';
 	mMCC[2] = wMCC[2]-'0';
-	mMNC[0] = wMNC[0]-'0'; 
+	mMNC[0] = wMNC[0]-'0';
 	mMNC[1] = wMNC[1]-'0';
 	// 24.008 10.5.5.15 says if only two digits, MNC[2] is 0xf.
 	mMNC[2] = wMNC[2] ? (wMNC[2]-'0') : 0xf;

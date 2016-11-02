@@ -132,6 +132,9 @@ unsigned GSM::uplinkFreqKHz(GSMBand band, unsigned ARFCN)
 		case PCS1900:
 			assert((ARFCN>=512)&&(ARFCN<=810));
 			return 1850200+200*(ARFCN-512);
+		case SMC390:
+			assert((ARFCN>=259)&&(ARFCN<=287));
+			return 370000+200*(ARFCN-259);
 		default:
 			assert(0);
 	}
@@ -145,6 +148,7 @@ unsigned GSM::uplinkOffsetKHz(GSMBand band)
 		case EGSM900: return 45000;
 		case DCS1800: return 95000;
 		case PCS1900: return 80000;
+		case SMC390: return 15000;
 		default: assert(0);
 	}
 }
@@ -398,7 +402,7 @@ void Z100Timer::set()
 	assert(mLimitTime!=0);
 	mEndTime = Timeval(mLimitTime);
 	mActive=true;
-} 
+}
 
 void Z100Timer::addTime(int msecs)	// Can be positive or negative
 {
@@ -415,14 +419,14 @@ void Z100Timer::expire()
 {
 	mEndTime = Timeval(0);
 	mActive=true;
-} 
+}
 
 
 void Z100Timer::set(long wLimitTime)
 {
 	mLimitTime = wLimitTime;
 	set();
-} 
+}
 
 
 long Z100Timer::remaining() const

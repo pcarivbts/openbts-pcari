@@ -53,10 +53,10 @@ using namespace SIP;	// For AudioFrame
 
 
 // (pat) David says this is the initial power level we want to send to handsets.
-// 33 translates to 2 watts, which is the max in the low band.  
+// 33 translates to 2 watts, which is the max in the low band.
 // The power control loop will rapidly turn down the power once SACCH is established.
 // This value is in DB.  It is converted to an ordered MS power based on tables in GSM 5.05 4.1.
-const float cInitialPower = 33; 
+const float cInitialPower = 33;
 
 
 // The actual phone settings change every 4 bursts, so average over at least 4.
@@ -104,7 +104,7 @@ static const unsigned cFERMemory = 208; // How many we frames we average FER, mi
 //@{
 
 /** Power control codes for GSM400, GSM850, EGSM900 from GSM 05.05 4.1.1. */
-static const int powerCommandLowBand[32] = 
+static const int powerCommandLowBand[32] =
 {
 	39, 39, 39, 37,	// 0-3
 	35, 33, 31, 29,	// 4-7
@@ -159,6 +159,7 @@ const int* pickTable()
 		case PCS1900:
 			return powerCommand1900;
 			break;
+		case SMC390:
 		default: return NULL;
 	}
 }
@@ -722,7 +723,7 @@ XCCHL1Decoder::XCCHL1Decoder(
 SharedL1Decoder::SharedL1Decoder()
 	: mBlockCoder(0x10004820009ULL, 40, 224),
 	mC(456),
-	mU(228), 
+	mU(228),
 	mP(mU.segment(184,40)),mDP(mU.head(224)),mD(mU.head(184)),
 	mHParity(0x06f,6,8),mHU(18),mHD(mHU.head(8))
 {
@@ -744,7 +745,7 @@ void XCCHL1Decoder::writeLowSideRx(const RxBurst& inBurst)
 	if (!decActive()) {
 		OBJLOG(DEBUG) <<"XCCHL1Decoder not active, ignoring input";
 		return;
-	} 
+	}
 	mDecoderStats.countSNR(inBurst);
 	// save frame number for possible decrypting
 	int B = mMapping.reverseMapping(inBurst.time().FN()) % 4;
@@ -1507,7 +1508,7 @@ void TCHFACCHL1Decoder::writeLowSideRx(const RxBurst& inBurst)
 		// if (!Control::SaveHandoverAccess(ref,inBurst.RSSI(),inBurst.timingError(),inBurst.time())) return;
 		// mUpstream->writeLowSide(HANDOVER_ACCESS);
 
-		if (ref == mHandoverRef) { 
+		if (ref == mHandoverRef) {
 			OBJLOG(NOTICE) << "queuing HANDOVER_ACCESS ref=" << ref;
 			mT3103.reset();
 			double when = gBTS.clock().systime(inBurst.time());
@@ -1528,7 +1529,7 @@ void TCHFACCHL1Decoder::writeLowSideRx(const RxBurst& inBurst)
 
 // (pat) How the burst gets here:
 // TRXManager.cpp has a wDemuxTable for each frame+timeslot with a pointer to
-// a virtual L1Decoder::writeLowSideRx() function.  For traffic channels, this maps to 
+// a virtual L1Decoder::writeLowSideRx() function.  For traffic channels, this maps to
 // XCCHL1Decoder::writeLowSideRx(), which checks active(), and if true,
 // then calls this, and if this returns true, goes ahead with decoding.
 bool TCHFACCHL1Decoder::processBurst( const RxBurst& inBurst)
@@ -1873,19 +1874,19 @@ bool TCHFRL1Decoder::decodeTCH_GSM(bool stolen,const SoftVector *wC)
 		//mClass1_c.decode(mVCoder,mTCHU);
 		//wC->head(378).decode(mVCoder,mTCHU);
 		mVCoder.decode(wC->head(378),mTCHU);
-	
+
 		// 3.1.2.2
 		// copy class 2 bits c[] to d[]
 		//mClass2_c.sliced().copyToSegment(mTCHD,182);
 		wC->segment(378,78).sliced().copyToSegment(mTCHD,182);
-	
+
 		// 3.1.2.1
 		// copy class 1 bits u[] to d[]
 		for (unsigned k=0; k<=90; k++) {
 			mTCHD[2*k] = mTCHU[k];
 			mTCHD[2*k+1] = mTCHU[184-k];
 		}
-	
+
 		// 3.1.2.1
 		// check parity of class 1A
 		unsigned sentParity = (~mTCHU.peekField(91,3)) & 0x07;
@@ -1896,7 +1897,7 @@ bool TCHFRL1Decoder::decodeTCH_GSM(bool stolen,const SoftVector *wC)
 		// (pat) Update: No we do not want to check the tail bits, because one of these
 		// being bad would cause discarding the vector.
 		//unsigned tail = mTCHU.peekField(185,4);
-	
+
 		OBJLOG(DEBUG) <<"TCHFACCHL1Decoder c[]=" << mC.begin()<<"="<< mC;
 		//OBJLOG(DEBUG) <<"TCHFACCHL1Decoder mclass1_c[]=" << mClass1_c.begin()<< "="<<mClass1_c;
 		OBJLOG(DEBUG) <<"TCHFACCHL1Decoder u[]=" << mTCHU;
@@ -1928,7 +1929,7 @@ bool TCHFRL1Decoder::decodeTCH_GSM(bool stolen,const SoftVector *wC)
 		// The spec give the bit-packing format in GSM 06.10 1.7.
 		// Note they start counting bits from 1, not 0.
 		// (pat) The first 36 bits are LAR filter reflection coefficient parameters applicable to the entire 20ms frame.
-		// See GSM 06.11 
+		// See GSM 06.11
 		// These are followed by 4 sets of 56 bits of parameters for each 5ms sub-frame, consiting of:
 		//	7 bits: N1, LTP lag
 		//	2 bits: b1, LTP gain
@@ -2140,7 +2141,7 @@ TCHFACCHL1Encoder::TCHFACCHL1Encoder(
 	unsigned wTN,
 	const TDMAMapping& wMapping,
 	L1FEC *wParent)
-	:XCCHL1Encoder(wCN, wTN, wMapping, wParent), 
+	:XCCHL1Encoder(wCN, wTN, wMapping, wParent),
 	mPreviousFACCH(true),mOffset(0)
 {
 	for(int k = 0; k<8; k++) {
@@ -2298,10 +2299,10 @@ void TCHFACCHL1Encoder::dispatch()
 	// Let previous data get transmitted.
 	resync();
 	waitToSend();
-	
+
 	// flag to control stealing bits
-	bool currentFACCH = false; 
-	
+	bool currentFACCH = false;
+
 	// Speech latency control.
 	// Since Asterisk is local, latency should be small.
 	OBJLOG(DEBUG) <<"TCHFACCHL1Encoder speechQ.size=" << mSpeechQ.size();
@@ -2410,9 +2411,9 @@ void TCHFACCHL1Encoder::dispatch()
 		mBurst.Hl(mPreviousFACCH);
 		// send
 		OBJLOG(DEBUG) <<"TCHFACCHEncoder sending burst=" << mBurst;
-		mDownstream->writeHighSideTx(mBurst,"FACCH");	
+		mDownstream->writeHighSideTx(mBurst,"FACCH");
 		rollForward();
-	}	
+	}
 
 	// Update the offset for the next transmission.
 	if (mOffset==0) mOffset=4;
@@ -2615,12 +2616,12 @@ void SACCHL1Encoder::encInit()
 
 
 
-SACCHL1Encoder* SACCHL1Decoder::SACCHSibling() 
+SACCHL1Encoder* SACCHL1Decoder::SACCHSibling()
 {
 	return mSACCHParent->encoder();
 }
 
-SACCHL1Decoder* SACCHL1Encoder::SACCHSibling() 
+SACCHL1Decoder* SACCHL1Encoder::SACCHSibling()
 {
 	return mSACCHParent->decoder();
 }
@@ -2649,7 +2650,7 @@ void SACCHL1Encoder::sendFrame(const L2Frame& frame)
 			if (deltaP > 0 && SNR < SNRTarget) {	// If RSSITarget is met but SNR looks bad...
 				// How do we decide what the target power should be from SNR?  And I dont want to call log().
 				// We only change upward based on SNR - we rely on RSSITarget to keep the power down.
-				deltaP = SNR - SNRTarget;	// So how about something simple like this?  eg: SNR == 10 is ok, SNR==6 would be bad, so add 4dB?  
+				deltaP = SNR - SNRTarget;	// So how about something simple like this?  eg: SNR == 10 is ok, SNR==6 would be bad, so add 4dB?
 			}
 		}
 		float actualPower = sib.actualMSPower();

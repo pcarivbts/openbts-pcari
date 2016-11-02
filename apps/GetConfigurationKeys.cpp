@@ -30,7 +30,17 @@ std::string getARFCNsString(unsigned band) {
 	float downlink;
 	float uplink;
 
-	if (band == 850) {
+    if (band == 390) {
+        //259:287 SMC390
+        downlink = 395.2;
+        uplink = 380.2;
+        for (i = 259; i <= 287; i++) {
+            ss << i << "|SMC390 #" << i << " : " << downlink << " MHz downlink / " << uplink << " MHz uplink,";
+            downlink += 0.2;
+            uplink += 0.2;
+        }
+
+	} else if (band == 850) {
 		// 128:251 GSM850
 		downlink = 869.2;
 		uplink = 824.2;
@@ -188,7 +198,7 @@ ConfigurationKeyMap getConfigurationKeys()
 	// * A,B : multiple choices of value A and B
 	// * X|A,Y|B : multiple choices of string "A" with value X and string "B" with value Y
 	// For CHOICE_OPT, the input value can also be empty.
-	// 
+	//
 	// (pat) I believe the following is valid for ConfigurationKey::REGEX and REGEX_OPT
 	// * ^REGEX$ : string must match regular expression
 	// For REGEX_OPT, the input value can also be empty.
@@ -1892,8 +1902,8 @@ ConfigurationKeyMap getConfigurationKeys()
 		false,
 		"Cell ID, 16 bits.  "
 			"In some cases, the last digit of the cell id represents the sector id. "
-			"A last digit of 0 is used for an omnidirectional antenna.  "	
-			"A last digit of 1, 2, 3, etc indicates a sector of the multi-sector antenna.  "	
+			"A last digit of 0 is used for an omnidirectional antenna.  "
+			"A last digit of 1, 2, 3, etc indicates a sector of the multi-sector antenna.  "
 			"Should be unique.",
 		ConfigurationKey::GLOBALLYUNIQUE
 	);
@@ -2309,7 +2319,8 @@ ConfigurationKeyMap getConfigurationKeys()
 		"",
 		ConfigurationKey::CUSTOMERWARN,
 		ConfigurationKey::CHOICE,
-		"850|GSM850,"
+		    "390|SMC390,"
+    		"850|GSM850,"
 			"900|PGSM900,"
 			"1800|DCS1800,"
 			"1900|PCS1900",

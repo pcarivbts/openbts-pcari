@@ -107,8 +107,12 @@ unsigned int FactoryCalibration::getValue(std::string name) {
 	// TODO : (mike) I thought these should be DEC comparisons but only HEX vals are matching,
 	//		too rushed for 3.1 to figure out why I'm dumb
 	} else if (name.compare("band")==0) {
+	    // BAND_39="39" # dec 57
+        if (band == 39) {
+            return 390;
+
 		// BAND_85="85" # dec 133
-		if (band == 85) {
+		} else if (band == 85) {
 			return 850;
 
 		// BAND_90="90" # dec 144

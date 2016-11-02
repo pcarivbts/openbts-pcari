@@ -221,7 +221,7 @@ void createStats()
 	gReports.create("OpenBTS.SIP.Failed.Remote.xxx");
 	// count of SIP transactions that failed due to local-end errors
 	gReports.create("OpenBTS.SIP.Failed.Local");
-	// count of timeout events on SIP socket reads 
+	// count of timeout events on SIP socket reads
 	gReports.create("OpenBTS.SIP.ReadTimeout");
 	// count of SIP messages that were never properly acked
 	gReports.create("OpenBTS.SIP.LostProxy");
@@ -688,7 +688,7 @@ int main(int argc, char *argv[])
 
 	// Send either TSC or full BSIC depending on radio need
 	if (gConfig.getBool("GSM.Radio.NeedBSIC")) {
-		// Send BSIC to 
+		// Send BSIC to
 		C0radio->setBSIC(gBTS.BSIC());
 	} else {
 		// Set TSC same as BCC everywhere.
@@ -888,7 +888,9 @@ vector<string> configurationCrossCheck(const string& key) {
 		int c0 = gConfig.getNum("GSM.Radio.C0");
 		string band = gConfig.getStr("GSM.Radio.Band");
 		string range;
-		if (band.compare("850") == 0 && (c0 < 128 || 251 < c0)) {
+		if (band.compare("390") == 0 && (c0 < 259 || 287 < c0)) {
+            range = "259-287";
+        } else if (band.compare("850") == 0 && (c0 < 128 || 251 < c0)) {
 			range = "128-251";
 		} else if (band.compare("900") == 0 && (c0 < 1 || 124 < c0)) {
 			range = "1-124";

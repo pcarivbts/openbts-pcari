@@ -79,7 +79,7 @@ class L3GprsDlMsg : public virtual L3GprsMsg
 	// This dummy constructor is used for uplink messages, when message can be both up and downlink:
 	L3GprsDlMsg() : mSense(senseInvalid) {}
 	// void setSense(MsgSense wSense) { mSense = wSense; }	//unused.
-	bool isSenseCmd() { 
+	bool isSenseCmd() {
 		assert(mSense != senseInvalid);
 		return mSense == senseCmd;
 	}
@@ -472,6 +472,7 @@ struct SmQoS : public ByteVector {
 // 5-15-2015, David says Range supports:
 // 850: GSM 850, 900: GSM E, 1800: GSM 1800, 1900: GSM 1900
 enum AccessTechnologyType {
+    SMC_390 = 14,
 	GSM_P = 0,
 	GSM_E = 1,
 	GSM_R = 2,
@@ -643,7 +644,7 @@ struct L3GmmMsgServiceRequest : L3GmmUlMsg
         void gmmParseBody(L3GmmFrame &src, size_t &rp);
         void textBody(std::ostream &os) const {
                 os <<LOGVAR(mCypheringKeySequenceNumber) << LOGVAR(mServiceType)
-			<<LOGVAR2("PdpContextStatus",mPdpContextStatus.str());        
+			<<LOGVAR2("PdpContextStatus",mPdpContextStatus.str());
                 mMobileId.text(os);
         }
 };
@@ -1031,7 +1032,7 @@ struct L3SmMsgDeactivatePdpContextAccept : L3SmDlMsg, L3SmUlMsg
 	void smParseBody(L3SmFrame &/*src*/,size_t &/*rp*/) {/*nothing*/}
 
 	// This message is bidirectional.  This constructor is for making one to send downstream:
-	L3SmMsgDeactivatePdpContextAccept(unsigned ti) : L3SmDlMsg(ti,senseReply) {} 
+	L3SmMsgDeactivatePdpContextAccept(unsigned ti) : L3SmDlMsg(ti,senseReply) {}
 	int MTI() const {return DeactivatePDPContextAccept;}
 	void smWriteBody(ByteVector &/*msg*/) {/*nothing*/}
 	void textBody(std::ostream &os) const;

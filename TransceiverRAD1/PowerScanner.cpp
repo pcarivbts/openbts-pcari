@@ -79,6 +79,7 @@ int main(int argc, char *argv[])
       case GSM::EGSM900: startARFCN=0; stopARFCN=124; break;
       case GSM::DCS1800: startARFCN=512; stopARFCN=885; break;
       case GSM::PCS1900: startARFCN=512; stopARFCN=810; break;
+      case GSM::SMC390: startARFCN=259; stopARFCN=287; break;
       default:
         LOG(ALERT) << "Unsupported GSM Band specified (config key GSM.Radio.Band). Exiting...";
         exit(-1);

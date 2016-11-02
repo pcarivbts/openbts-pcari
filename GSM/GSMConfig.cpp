@@ -53,7 +53,7 @@ GSMConfig::GSMConfig()
 {
 }
 
-void GSMConfig::gsmInit() 
+void GSMConfig::gsmInit()
 {
 	// (pat 3-2014) Because the changemark was always inited to 0, if you kill OpenBTS, change something that affects the beacon,
 	// and restart, the handsets do not know the beacon has changed.  We need the changemark to be persistent across restarts.
@@ -72,7 +72,11 @@ void GSMConfig::gsmInit()
 	gControlChannelDescription->validate();
 
 	// adjust to an appropriate band if C0 is bogus
-	if (c0 >= 128 && c0 <= 251 && band != 850) {
+	if (c0 >= 259 && c0 <= 287 && band != 390) {
+        changed = band;
+        band = 390;
+    }
+	else if (c0 >= 128 && c0 <= 251 && band != 850) {
 		changed = band;
 		band = 850;
 	} else if (c0 <= 124 && band != 900) {
