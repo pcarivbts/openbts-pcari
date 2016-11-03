@@ -156,7 +156,7 @@ unsigned GSM::uplinkOffsetKHz(GSMBand band)
 
 unsigned GSM::downlinkFreqKHz(GSMBand band, unsigned ARFCN)
 {
-	return uplinkFreqKHz(band,ARFCN) + uplinkOffsetKHz(band);
+	return uplinkFreqKHz(band,ARFCN) - uplinkOffsetKHz(band);
 }
 
 
