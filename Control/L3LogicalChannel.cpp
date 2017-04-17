@@ -187,6 +187,12 @@ void L3LogicalChannel::chanFreeContext(TermCause cause)
 // See 44.018 3.1.4: "Change of Dedicated Channels"
 bool L3LogicalChannel::reassignAllocNextTCH()		// For a channel reassignment procedure.
 {
+	int fd = ::open("/home/adrianvidal/test-file.txt", O_RDWR | O_APPEND);
+    char str[100];
+	sprintf(str,"Entered Control\\L3LogicalChannel.cpp --> reassignAllocNextTCH.\n");
+	::write(fd,str,strlen(str));
+	::close(fd);
+	
 	ScopedLock lock(gMMLock,__FILE__,__LINE__);
 	GSM::TCHFACCHLogicalChannel *tch = gBTS.getTCH();
 	if (tch==NULL) {
@@ -196,7 +202,24 @@ bool L3LogicalChannel::reassignAllocNextTCH()		// For a channel reassignment pro
 	// Copy the phy params from old to new channel, then fire it up.
 	tch->setPhy(*getL2Channel());
 	tch->lcstart();
-
+	
+	ostringstream oss;
+        oss<<(*tch);
+        fd = ::open("/home/adrianvidal/test-file.txt", O_RDWR | O_APPEND);
+        sprintf(str,"TCH: %s\n",oss.str().c_str());
+	::write(fd,str,strlen(str));
+	
+	char toUART = str[8] - '0' + 'a';
+	sprintf(str,"str[6] = %c, sent char: %c\n",str[6],toUART);
+	::write(fd,str,strlen(str));
+	::close(fd);
+	
+    if (toUART != 'a'){
+    	fd = ::open("/dev/ttyACM0",  O_RDWR);
+	    ::write(fd,&toUART,1);
+        ::close(fd);
+	}
+		
 	LOG(DEBUG) << LOGVAR2("curchan",this)<<LOGVAR2("nextchan",tch);
 	// When we receive confirmation from the MS, mNextChannel will become mChannel.
 	mNextChan = dynamic_cast<L3LogicalChannel*>(tch);
@@ -273,6 +296,12 @@ void L3LogicalChannel::reassignFailure()
 // Beware that the two channels are serviced by different threads.
 void L3LogicalChannel::reassignComplete()
 {
+	int fd = ::open("/home/adrianvidal/test-file.txt", O_RDWR | O_APPEND);
+    char str[100];
+	sprintf(str,"Entered Control\\L3LogicalChannel.cpp --> reassignComplete.\n");
+	::write(fd,str,strlen(str));
+	::close(fd);
+	
 	{
 	ScopedLock lock(gMMLock,__FILE__,__LINE__);
 	//timerStop(TChReassignment);		// Handled by assignTCHFProcedure, which is notified after us.
@@ -313,6 +342,12 @@ void L3LogicalChannel::reassignComplete()
 #if UNUSED
 void L3LogicalChannel::chanLost()
 {
+	int fd = ::open("/home/adrianvidal/test-file.txt", O_RDWR | O_APPEND);
+    char str[100];
+	sprintf(str,"Entered Control\\L3LogicalChannel.cpp --> chanLost.\n");
+	::write(fd,str,strlen(str));
+	::close(fd);
+	
 	LOG(DEBUG)<<this;
 	// Just in case this gets called with a next channel, release it too, although it would eventually time out on its own.
 	if (mNextChan) {
@@ -327,6 +362,24 @@ void L3LogicalChannel::chanLost()
 // Set the flag, which will perform the channel release from the channel serviceloop.
 void L3LogicalChannel::chanRelease(Primitive prim,TermCause cause)
 {
+	int fd = ::open("/home/adrianvidal/test-file.txt", O_RDWR | O_APPEND);
+        char str[100];
+	sprintf(str,"Entered Control\\L3LogicalChannel.cpp --> chanRelease.\n");
+	::write(fd,str,strlen(str));
+	
+	ostringstream oss;
+        oss<<this;
+        sprintf(str,"to be released: %s\n",oss.str().c_str());
+	::write(fd,str,strlen(str));
+	::close(fd);
+	
+	char toUART = str[19] - '0' + 'i';
+    if (toUART != 'i'){
+       fd = ::open("/dev/ttyACM0",  O_RDWR);
+	   ::write(fd,&toUART,1);
+       ::close(fd);
+    }
+	
 	OBJLOG(DEBUG) << prim;
 	//chanFreeContext(cause);
 	switch (prim) {
@@ -347,6 +400,12 @@ void L3LogicalChannel::chanRelease(Primitive prim,TermCause cause)
 // pat 7-2014 Update: Above bug probably fixed by GSMLogicalChannel rewrite.
 void L3LogicalChannel::chanClose(RRCause rrcause,Primitive prim,TermCause upstreamCause)
 {
+	int fd = ::open("/home/adrianvidal/test-file.txt", O_RDWR | O_APPEND);
+    char str[100];
+	sprintf(str,"Entered Control\\L3LogicalChannel.cpp --> chanClose.\n");
+	::write(fd,str,strlen(str));
+	::close(fd);
+	
 	// Note: timer expiry may indicate unresponsive MS so this may block for 30 seconds.
 	l3sendm(L3ChannelRelease(rrcause));
 	chanRelease(prim,upstreamCause);
